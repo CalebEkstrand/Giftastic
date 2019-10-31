@@ -1,1 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="utf-8">
+    <title>Sandwhichs</title>
+    <link href="https://fonts.googleapis.com/css?family=Staatliches&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+        <h1>SANDWHICHES</h1>
+
+        
+        <div id="buttons-view"></div>
+        <form id="sandwhich-form">
+                <label for="sandwhich-input">Add your fav sandwhich.</label>
+                <input type="text" id="sandwhich-input">
+                <br>
+          
+                <input id="add-gif" type="button" value="Add your fav sandwhich.">
+              </form>
+    <div id="sandwhichs-view"></div>
+
+    <div id="btnArea"></div>
+    <!-- <button data-sandwhich="Ham-Sandwhich">Ham Sandwhich</button>
+    <button data-sandwhich="Peanut-Butter-Jelly">PBJ</button>
+    <button data-sandwhich="Grilled-Cheese">Grilled Cheese</button> -->
+    <div id="gifs-appear-here">
+    </div>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    var buttons = ["Ham-Sandwhich", "Peanut-Butter-Jelly", "Grilled-Cheese"]
+    function populateButtons(arr){
+        $("#btnArea").empty();
+        arr.forEach(element => {
+            var btn = $("<button>");
+            btn.attr("data-sandwhich",element);
+            btn.attr("class","cat-btn")
+            btn.text(element);
+            $("#btnArea").append(btn);
+        });
+    }
+    populateButtons(buttons);
+
+    $("#add-gif").on("click", function(event){
+        event.preventDefault();
+        var userInput = $("#sandwhich-input").val();
+        $("#sandwhich-input").val("");
+        buttons.push(userInput);
+        populateButtons(buttons)
+      
+    })
+
+        $("#gifs-appear-here").on("click",".gif", function () {
+            var state = $(this).attr("data-state");
+            if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+            } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+            }
+        });
+
+        $("#btnArea").on("click", ".cat-btn",function () {
+      
+            var sandwhich = $(this).attr("data-sandwhich");
+
+        
+            var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+                sandwhich + "&api_key=BkaUZZWcFij6J7AoQj3WtPb1R2p9O6V9&limit=10";
+
+          
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+     
+                .then(function (response) {
+                    console.log(queryURL);
+
+                    console.log(response);
+             
+                    var results = response.data;
+
+               
+                    for (var i = 0; i < results.length; i++) {
+
+                    
+                        var sandwhichDiv = $("<div>");
+
+                        var p = $("<p>").text("Rating: " + results[i].rating);
+
+                 
+                        var sandwhichImage = $("<img>");
+                  
+                        sandwhichImage.attr("src", results[i].images.fixed_height_still.url);
+                        sandwhichImage.attr("data-still", results[i].images.fixed_height_still.url);
+                        sandwhichImage.attr("data-animate", results[i].images.fixed_height.url);
+                        sandwhichImage.attr("data-state", "still");
+                        sandwhichImage.attr("class", "gif");
+
+                  
+                        sandwhichDiv.append(p);
+                        sandwhichDiv.append(sandwhichImage);
+
+       
+                        $("#gifs-appear-here").prepend(sandwhichDiv);
+                    }
+                });
+        });
+
+
+    </script>
+</body>
+
+</html>
